@@ -4,6 +4,26 @@
 import numpy as np
 import math
 
+def new_map(func, tensor):
+    if type(tensor) != np.ndarray:
+        return func(tensor) 
+    ret = []
+    for iter in tensor:
+        ret.append(new_map(func, iter))
+
+    return np.array(ret)
+
+def new_compare(func, tensor1, tensor2):
+    if type(tensor1) != np.ndarray:
+        # import pdb;pdb.set_trace()
+        return func(tensor1, tensor2)
+
+    ret = []
+    for (iter1, iter2) in zip(tensor1, tensor2):
+        ret.append(new_compare(func, iter1, iter2))
+
+    return np.array(ret)
+
 class RBM:
     """Restricted Boltzmann Machine."""
 
@@ -27,16 +47,34 @@ class RBM:
     def sigmod(x):
         return 1 / (1 + math.exp(-x))
 
+    def _sample_binary(self, p):
+        """
+        Sample the binary vector by given probability tensor
+        """
+        def get_random(s):
+            return np.random.uniform(0, 1)
+
+        def compare_func(a, b):
+            return 0 if a < b else 1
+
+        return new_compare(compare_func, \
+                    new_map(get_random, p), p)
+
+
     def sample(self, iter_times=10):
         """Sample from trained model."""
         # 请补全此处代码
-
+        new_v = np.random(self.n_observe, 1)
         for iter in range(iter_times):
             p_h = self.sigmod(np.matmul( \
-                    self.W.traponse(), self.v) + self.b)
+                    self.W.traponse(), new_v) + self.b)
 
-            slef.v = self._sample_binary(p_h)
+            new_h = self._sample_binary(p_h)
+            p_v = self.sigmod(np.matmul( \
+                    self.W, new_h) + self.a)
+            new_v = self._sample_binary(p_v)
 
+        return new_v
 
 # train restricted boltzmann machine using mnist dataset
 if __name__ == '__main__':
@@ -44,7 +82,7 @@ if __name__ == '__main__':
     mnist = np.load('mnist_bin.npy')  # 60000x28x28
     n_imgs, n_rows, n_cols = mnist.shape
     img_size = n_rows * n_cols
-    print mnist.shape
+    print (mnist.shape)
 
     # construct rbm model
     rbm = RBM(2, img_size)
@@ -54,3 +92,6 @@ if __name__ == '__main__':
 
     # sample from rbm model
     s = rbm.sample()
+    import pdb;pdb.set_trace()
+
+
