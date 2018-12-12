@@ -38,11 +38,15 @@ class RBM:
 
         pass
 
-    def train(self, data):
+    def train(self, data, max_epoch=10):
         """Train model using data."""
 
         # 请补全此处代码
-        pass
+        self.visible = data.reshape(-1, self.n_observe)
+        for epoch in range(max_epoch):
+            np.random.shuffle(data)
+
+            ## CD loss
 
     def sigmod(x):
         return 1 / (1 + math.exp(-x))

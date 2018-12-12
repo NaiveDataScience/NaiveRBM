@@ -1,25 +1,7 @@
 import numpy as np
 import math
 
-def new_map(func, tensor):
-    if type(tensor) != np.ndarray:
-        return func(tensor) 
-    ret = []
-    for iter in tensor:
-        ret.append(new_map(func, iter))
 
-    return np.array(ret)
-
-def new_compare(func, tensor1, tensor2):
-    if type(tensor1) != np.ndarray:
-        # import pdb;pdb.set_trace()
-        return func(tensor1, tensor2)
-
-    ret = []
-    for (iter1, iter2) in zip(tensor1, tensor2):
-        ret.append(new_compare(func, iter1, iter2))
-
-    return np.array(ret)
 
 def add1(x):
 	return x + 1
