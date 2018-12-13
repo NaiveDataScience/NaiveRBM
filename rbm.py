@@ -36,17 +36,40 @@ class RBM:
         self.b = np.random.rand(n_hidden, 1) # bias for the hidden variables
         # 请补全此处代码
 
+        self.alpha = 0.01 # learning rate
         pass
 
-    def train(self, data, max_epoch=10):
+
+
+    def train(self, data, max_epoch=10, max_process=5):
         """Train model using data."""
 
         # 请补全此处代码
         self.visible = data.reshape(-1, self.n_observe)
         for epoch in range(max_epoch):
             np.random.shuffle(data)
+            for v in data:
+                ## CD loss
+                v = v.reshape(-1, 1)
+                h_dist = self.sigmoid(
+                    np.matmul(np.transpose(self.weight), v) + self.b)
+                h_sample = self._sample_binary(h_dist)
 
-            ## CD loss
+                v_dist = self.sigmoid(
+                    np.matmul(np.transpose(self.weight), v) + self.a)
+                v_sample = self._sample_binary(v_dist)
+
+                h_dist2 = self.sigmoid(
+                    np.matmul(np.transpose(self.weight), v) + self.b)
+                h_sample2 = self._sample_binary(h_dist2)
+                ## Update weight
+                self.weight += self.alpha * \
+                    (np.matmul(v_n, h_sample.transpose()) -
+                        np.matmul(v_sample, h_sample2.transpose()))
+
+                self.a += self.alpha * (v - v_sample)
+                self.b += self.alpha * (h_sample - h_sample2)
+
 
     def sigmod(x):
         return 1 / (1 + math.exp(-x))
@@ -83,7 +106,8 @@ class RBM:
 # train restricted boltzmann machine using mnist dataset
 if __name__ == '__main__':
     # load mnist dataset, no label
-    mnist = np.load('mnist_bin.npy')  # 60000x28x28
+    mnist = np.load('mnist_bin.npz')  # 60000x28x28
+    import pdb;pdb.set_trace()
     n_imgs, n_rows, n_cols = mnist.shape
     img_size = n_rows * n_cols
     print (mnist.shape)
