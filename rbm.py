@@ -1,6 +1,12 @@
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--hidden_layer', '-y', required=False, type=int, default=100)
+parser.add_argument('--learning_rate', '-l', required=False, type=float, default=0.01)
+args = parser.parse_args()
 
 
 def new_map(func, tensor):
@@ -22,6 +28,13 @@ def new_compare(func, tensor1, tensor2):
         ret.append(new_compare(func, iter1, iter2))
 
     return np.array(ret)
+
+def compare_img(raw_img, gen_img):
+    plt.subplot(1,2,1)
+    plt.imshow(raw_img.reshape((28, 28)), cmap="gray")
+    plt.subplot(1,2,2)
+    plt.imshow(gen_img.reshape((28, 28)), cmap="gray")
+    plt.savefig("result.png")
 
 def sigmoid(x):
     try:
@@ -45,7 +58,6 @@ class RBM:
         # 请补全此处代码
 
         self.alpha = alpha # learning rate
-        # pass
 
 
     def train(self, data, max_epoch=3):
@@ -127,12 +139,16 @@ class RBM:
 
 # train restricted boltzmann machine using mnist dataset
 if __name__ == '__main__':
-    # load mnist dataset, no label
+    
+    num_layers = args.hidden_layer
+    lr = args.learning_rate
+    import pdb;pdb.set_trace()
+    # load mnist dataset
     mnist = np.load('mnist_bin.npy')  # 60000x784
     n_imgs, img_size = mnist.shape
 
     # construct rbm model
-    rbm = RBM(100, img_size)
+    rbm = RBM(num_layers, img_size, lr)
 
     # train rbm model using mnist
     # rbm.train(mnist[0:6000], 3)
@@ -141,9 +157,5 @@ if __name__ == '__main__':
     random_index = np.random.randint(len(mnist))
     raw_img = mnist[random_index].reshape(-1, 1)
     gen_img = rbm.sample(raw_img, 3)
-
-    plt.subplot(1,2,1)
-    plt.imshow(raw_img.reshape((28, 28)), cmap="gray")
-    plt.subplot(1,2,2)
-    plt.imshow(gen_img.reshape((28, 28)), cmap="gray")
-    plt.savefig("result.png")
+    compare_img(raw_img, gen_img)
+    
