@@ -20,7 +20,6 @@ def new_map(func, tensor):
 
 def new_compare(func, tensor1, tensor2):
     if type(tensor1) != np.ndarray:
-        # import pdb;pdb.set_trace()
         return func(tensor1, tensor2)
 
     ret = []
@@ -142,7 +141,6 @@ if __name__ == '__main__':
     
     num_layers = args.hidden_layer
     lr = args.learning_rate
-    import pdb;pdb.set_trace()
     # load mnist dataset
     mnist = np.load('mnist_bin.npy')  # 60000x784
     n_imgs, img_size = mnist.shape
